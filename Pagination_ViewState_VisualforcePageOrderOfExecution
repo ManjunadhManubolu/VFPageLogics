@@ -1,4 +1,4 @@
-<apex:page tabStyle="Account" controller="GETITNonStatic" lightningStylesheets="true" action="{!onPageLoad}" readOnly="true">
+<apex:page tabStyle="Account" controller="RetriveRecords" lightningStylesheets="true" action="{!onPageLoad}" readOnly="true">
     <apex:form >
         <apex:selectList value="{!choosenValue}" size="1" onchange="FetchData(this.options[this.selectedIndex].text);">
             <apex:selectOptions value="{!dynamiclist}"></apex:selectOptions>
