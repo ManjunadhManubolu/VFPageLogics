@@ -1,10 +1,10 @@
-public class GETITNonStatic 
+public class RetriveRecords 
 { 
     public String choosenValue {get;set;}
     Public Boolean PBFlag{get;set;}
     Public Account[] accRec{get;set;}
     public  List<Account> currentIterationRecords{get;set;}
-    public GETITNonStatic()
+    public RetriveRecords()
     {
         System.debug('---Constructor----');
     }
