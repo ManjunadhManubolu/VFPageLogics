@@ -1,3 +1,13 @@
+<!-- 
+GET Request : https://developer.salesforce.com/docs/atlas.en-us.224.0.pages.meta/pages/pages_controller_get_request.htm?search_text=view%20state
+
+POSTBack REQUEST : https://developer.salesforce.com/docs/atlas.en-us.pages.meta/pages/pages_controller_postback_request.htm
+
+View state components : https://developer.salesforce.com/docs/atlas.en-us.224.0.pages.meta/pages/pages_tools_edit_toolbar.htm?search_text=view%20state
+
+'The view state is updated whenever the page is updated'
+-->
+
 <apex:page tabStyle="Account" controller="RetriveRecords" lightningStylesheets="true" action="{!onPageLoad}" readOnly="true">
     <apex:form >
         <apex:selectList value="{!choosenValue}" size="1" onchange="FetchData(this.options[this.selectedIndex].text);">
