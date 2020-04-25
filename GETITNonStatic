@@ -1,0 +1,160 @@
+public class GETITNonStatic 
+{ 
+    public String choosenValue {get;set;}
+    Public Boolean PBFlag{get;set;}
+    Public Account[] accRec{get;set;}
+    public  List<Account> currentIterationRecords{get;set;}
+    public GETITNonStatic()
+    {
+        System.debug('---Constructor----');
+    }
+    
+    /* *********Pagination related fields********** */
+    private Integer PAGE_SIZE = 500;
+    public  Integer page{get;set;}
+    public  Integer totalRecords{get;set;}
+    public  Integer totalPages{get;set;}
+    public  Integer startIdx{get;set;}
+    public  Integer endIdx{get;set;}
+    
+    /* ******************************************** */
+    
+    public List<SelectOption> getdynamiclist()
+    {
+        System.debug('----'+choosenValue);
+        
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption('Current Month','Current Month'));
+        options.add(new SelectOption('Previous Month','Previous Month'));
+        return options;        
+    }
+    Public PageReference go()
+    {  
+        System.debug('---> '+choosenValue);
+        
+        PAGE_SIZE=500;
+        page=1;
+        currentIterationRecords= new List<Account>();
+        
+        if(choosenValue=='Current Month')
+        {
+            retriveRecordsForPagination('Current Month');
+            PBFlag=true;
+        }
+        else if(choosenValue=='Previous Month')
+        {
+            retriveRecordsForPagination('Previous Month');
+            PBFlag=true;
+        }     
+        return null;
+    }
+    
+    public List<Account> currentMonthRecords()
+    {
+        return [Select Id,Name From Account where createdDate =THIS_MONTH]; 
+    }
+    
+    @RemoteAction
+    @Readonly
+    public static List<Account> previousMonthRecords()
+    {
+        return [Select Id,Name From Account where createdDate =Last_N_Days:500]; 
+    }
+    
+    public void onPageLoad()
+    {
+        PBFlag=true;
+        PAGE_SIZE=500;
+        page=1;
+        System.debug('---action Method ----');
+        currentIterationRecords= new List<Account>();
+        retriveRecordsForPagination('Current Month');   
+    }
+    
+    /* *************************Pagination Methods********************************************/
+    public void doNext()
+    {
+        if(getHasNext()){
+            this.page++;
+            if(choosenValue=='Current Month')
+            {
+                retriveRecordsForPagination('Current Month');
+            }
+            else if(choosenValue=='Previous Month')
+            {
+                retriveRecordsForPagination('Previous Month');
+            }
+            system.debug('--DoNext '+this.page);
+        }
+    }
+    public Boolean getHasNext(){
+        System.debug('---page '+this.page + '--- totalPages '+this.totalPages);
+        if(this.page<this.totalPages){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }    
+    public Boolean getHasPrevious(){
+        if(this.page>1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public void doPrevious(){
+        if(getHasPrevious()){
+            this.page--;
+            if(choosenValue=='Current Month')
+            {
+                retriveRecordsForPagination('Current Month');
+            }
+            else if(choosenValue=='Previous Month')
+            {
+                retriveRecordsForPagination('Previous Month');
+            }
+            System.debug('---doPrevious-- page'+this.page);
+        }
+    }
+    
+    public void retriveRecordsForPagination(String whichMonth)
+    {
+        this.startIdx = (this.page-1)*PAGE_SIZE;
+        this.endIdx = this.page*PAGE_SIZE;
+        this.totalRecords = 0;
+        currentIterationRecords.clear();
+        List<Account> accList = new List<Account>();
+        if(whichMonth =='Current Month')
+            accList=currentMonthRecords();
+        else if(whichMonth =='Previous Month')
+            accList=previousMonthRecords();
+        
+        for(Account acc : accList)
+        {				
+            if(this.totalRecords>=this.startIdx && this.totalRecords<this.endIdx){
+                currentIterationRecords.add(acc);
+            }
+            this.totalRecords++;
+        }
+        System.debug('totalRecords---'+this.totalRecords);
+        Decimal pages = Decimal.valueOf(this.totalRecords);
+        System.debug('pages---'+pages);
+        pages = pages.divide(Decimal.valueOf(this.PAGE_SIZE), 2);  
+        System.debug('pages-142--'+pages);
+
+        this.totalPages = (Integer)pages.round(System.RoundingMode.CEILING);
+        System.debug('totalPages--'+this.totalPages);
+        this.startIdx++;
+        if(this.endIdx>this.totalRecords){
+            this.endIdx = this.totalRecords;
+        }
+        
+        System.Debug(LoggingLevel.WARN,'@@@ LIMIT query rows: '+Limits.getQueryRows()+' / '+Limits.getLimitQueryRows());
+        System.Debug(LoggingLevel.WARN,'@@@ LIMIT heap size: '+Limits.getHeapSize()+' / '+Limits.getLimitHeapSize());
+        System.Debug(LoggingLevel.WARN,'@@@ LIMIT cpu time: '+Limits.getCpuTime()+' / '+Limits.getLimitCpuTime());
+    }
+    /* *************************Pagination Methods end********************************************/
+    
+}
