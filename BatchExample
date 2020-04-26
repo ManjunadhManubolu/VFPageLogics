@@ -1,0 +1,42 @@
+global class BatchExample implements Database.Batchable<sobject>, Database.Stateful{
+   
+   public BatchExample()   //No.of times constructor execute =>1
+   {
+	   
+   }
+   Integer i = 0;
+    global Database.QueryLocator start(Database.BatchableContext bc) //No.of times constructor execute =>=> 1
+	{
+        return Database.getQueryLocatory([SELECT Id, Name, Sequence_Number__c FROM Employee__c]);
+    }
+    
+    global void execute(Database.BatchableContext bc, List<Employee__c> listEmployee){
+        integer b=0;
+		for(Employee__c e : listEmp){
+            e.Sequence_Number__c = i;
+            i ++;
+			b++;
+        }
+		
+		i=2001
+    }    
+    global void finish(Database.BatchableContext bc){  //No.of times constructor execute =>1
+    }
+}
+
+/*										 scope
+Database.executebatch(new BatchExample(),2000);  Min = 1 , Default =200 Max =2000
+
+->Assuming the Employee__c object has 10,000 records.
+
+->No.of Times execute method execute = Totalno.of Records / Scope
+10,000 => 10,000/2000 = 5 times execute() method will execute => 5 Transactions
+
+->Examples of elements(governor limits) involved in Transaction 
+DML -150 
+SOQL -200
+CPU -60 sec
+
+Governor limits official doc: https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_apexgov.htm
+
+*/
