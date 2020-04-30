@@ -1,0 +1,64 @@
+public without sharing class SharingCheck 
+{
+    public Account acc{get;set;}
+    public String accountSource{get;set;}
+    public String choosenExecutionMode{get;set;}
+    public Boolean withSahringModeflag{get;set;}
+    public Boolean withoutSahringModeflag{get;set;}
+    public Boolean FLSflag{get;set;}
+    
+    /* Dynamically fetch the month value from custom label. */
+    public List<SelectOption> getExecutionModes()
+    {       
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption('With Sharing','With Sharing'));
+        options.add(new SelectOption('Without Sharing','Without sharing'));
+        options.add(new SelectOption('FLS Check','FLS Check'));
+        return options;        
+    }    
+    public void onPageLoad()
+    {
+        System.debug('---Action attribute method is loaded----');
+        List<Account> accList = [Select Id,AccountSource From Account where ID='0016A00000r5OZ8'];
+        accountSource =accList[0].AccountSource;
+        System.debug('---fls check----'+accList[0].AccountSource);
+        acc=accList[0];
+    }
+    public PageReference go()
+    {
+        if(choosenExecutionMode=='With Sharing')
+        {
+            withSahringModeflag=true; //Created -0013s00000zb4ds   //0016A00000r5OZ8
+            List<Account> accList = [Select Id,AccountSource From Account Where ID='0013s00000zb4ds'];
+           	accList[0].AccountSource='Advertisement';
+            System.debug('before update---'+accList);
+            Update accList;
+            System.debug('After update---'+accList);
+            acc=accList[0];
+            return null;            
+        }
+        if(choosenExecutionMode=='Without Sharing')
+        {
+            withoutSahringModeflag=true;
+            List<Account> accList = [Select Id,AccountSource From Account where ID='0016A00000pAgRT'];
+            accList[0].AccountSource='Advertisement';
+            System.debug('before update---'+accList+'  ----source '+accList[0].AccountSource);
+            Update accList;
+            System.debug('After update---'+accList+'  ----source '+accList[0].AccountSource);
+            acc=accList[0];
+            accountSource=accList[0].AccountSource;
+            return null; 
+        } 
+        if(choosenExecutionMode=='FLS Check')
+        {
+            FLSflag=true;
+            List<Account> accList = [Select Id,AccountSource From Account where ID='0016A00000r5OZ8'];
+            accountSource =accList[0].AccountSource;
+            System.debug('---fls check----'+accountSource);
+            acc=accList[0];
+            return null; 
+        }
+        else
+            return null;
+    }
+}
