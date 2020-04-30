@@ -1,0 +1,30 @@
+<apex:page controller="SharingCheck" lightningStylesheets="true" action="{!onPageLoad}">
+    {!accountSource}
+    <apex:form >
+        <apex:selectList value="{!choosenExecutionMode}" size="1" onchange="FetchData(this.options[this.selectedIndex].text);">
+            <apex:selectOptions value="{!ExecutionModes}"></apex:selectOptions>
+        </apex:selectList>
+        <apex:commandButton value="GO" action="{!go}" >
+        </apex:commandButton>
+        
+        <apex:pageBlock rendered="{!withSahringModeflag}">
+            <apex:outputField value="{!acc.AccountSource}"/><br/>
+            <apex:outputText value="{!acc.AccountSource}"/><br/> 
+            {!acc.AccountSource}
+        </apex:pageBlock>
+        
+        <apex:pageBlock rendered="{!withoutSahringModeflag}">
+            <apex:outputField value="{!acc.AccountSource}"/><br/>
+            <apex:outputText value="{!acc.AccountSource}"/><br/> 
+            {!acc.AccountSource}
+            {!accountSource}
+        </apex:pageBlock>
+        
+        <apex:pageBlock rendered="{!FLSflag}">
+            {!accountSource}<br/>
+            <apex:outputField value="{!acc.AccountSource}"/><br/>
+            <apex:outputText value="{!acc.AccountSource}"/><br/> 
+            {!acc.AccountSource} <br/> {!acc}<br/> 
+        </apex:pageBlock>    
+    </apex:form>
+</apex:page>
