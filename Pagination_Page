@@ -1,0 +1,34 @@
+<apex:page tabStyle="Account" controller="PaginationController" lightningStylesheets="true" action="{!onPageLoad}">
+    <apex:form >
+        <apex:selectList value="{!choosenMonth}" size="1" onchange="FetchData(this.options[this.selectedIndex].text);">
+            <apex:selectOptions value="{!Monthslist}"></apex:selectOptions>
+        </apex:selectList>
+        <apex:selectList value="{!choosenYear}" size="1" onchange="FetchData(this.options[this.selectedIndex].text);">
+            <apex:selectOptions value="{!Yearlist}"></apex:selectOptions>
+        </apex:selectList>
+        <apex:commandButton value="GO" action="{!go}" >
+        </apex:commandButton>
+        
+        <apex:pageBlock rendered="{!PBFlag}">
+            <apex:dataTable value="{!currentIterationRecords}" var="account" id="theTable" rowClasses="odd,even" styleClass="tableClass">                
+                <apex:column >
+                    <apex:facet name="header">Name</apex:facet>
+                    <apex:outputText value="{!account.name}"/>
+                </apex:column>                
+                <apex:column >
+                    <apex:facet name="header">Id</apex:facet>
+                    <apex:outputText value="{!account.ID}"/>
+                </apex:column>
+            </apex:dataTable>
+            
+            <br/><br/>
+            <apex:commandLink action="{!doPrevious}" rendered="{!hasPrevious}" value="Previous" />
+            <apex:outputLabel rendered="{!NOT(hasPrevious)}" value="Previous" />
+            <apex:outputLabel value=" (page {!page} of {!totalPages}) | showing {!startIdx} to {!endIdx} of {!totalRecords} " />
+            <apex:commandLink action="{!doNext}" rendered="{!hasNext}" value="Next" />
+            <apex:outputLabel rendered="{!NOT(hasNext)}" value="Next" />
+            
+        </apex:pageBlock>
+        
+    </apex:form> 
+</apex:page>
