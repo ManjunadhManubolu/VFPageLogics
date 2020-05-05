@@ -4,7 +4,7 @@ public class PaginationController
     public transient String choosenYear {get;set;}
     
     Public  Boolean PBFlag{get;set;}
-    Public 	transient Account[] accRec{get;set;}
+    Public  transient Account[] accRec{get;set;}
     public  transient List<Account> currentIterationRecords{get;set;}
     
     Public Map<String,Integer> monthsMap = new Map<String,Integer>{'JAN'=>1,'FEB'=>2,'MAR'=>3,
@@ -45,7 +45,7 @@ public class PaginationController
     private Date getDate(String choosenYear, String choosenMonth)
     {
         /* Converting the captured 'Year' & 'Month' into Date format and always the date will set as '1'
-Example : if user selects "JAN" & "2018" then we are converting as "01-JAN-2018" */
+          Example : if user selects "JAN" & "2018" then we are converting as "01-JAN-2018" */
         System.debug('---'+monthsMap);
         Date createdDate = Date.newInstance(integer.valueof(choosenYear), 
                                             monthsMap.get(choosenMonth), 1);         
@@ -126,9 +126,7 @@ Example : if user selects "JAN" & "2018" then we are converting as "01-JAN-2018"
         {
             this.page--;
             Date CreatedDate = getDate(choosenYear,choosenMonth);
-            
             Date EndDate = CreatedDate.addMonths(1);
-            
             retriveRecordsForPagination(CreatedDate,EndDate);
         }
     }
