@@ -1,7 +1,7 @@
 public class PaginationController 
 { 
-    public   transient String choosenMonth {get;set;}
-    public   transient String choosenYear {get;set;}
+    public transient String choosenMonth {get;set;}
+    public transient String choosenYear {get;set;}
     
     Public  Boolean PBFlag{get;set;}
     Public 	transient Account[] accRec{get;set;}
@@ -9,9 +9,9 @@ public class PaginationController
     
     Public Map<String,Integer> monthsMap = new Map<String,Integer>{'JAN'=>1,'FEB'=>2,'MAR'=>3,
         'APR'=>4,'MAY'=>5,'JUN'=>6,'JUL'=>7,'AUG'=>8,'SEP'=>9,'OCT'=>10,'NOV'=>11,'DEC'=>12};
-   
-    /* *********Pagination related fields********** */
-    private  Integer PAGE_SIZE = 5;
+            
+   /* *********Pagination related fields********** */
+    private Integer PAGE_SIZE = 5;
     public  Integer page{get;set;}
     public  transient Integer totalRecords{get;set;}
     public  Integer totalPages{get;set;}
@@ -19,12 +19,11 @@ public class PaginationController
     public  transient Integer endIdx{get;set;}
     
     /* ******************************************** */         
-            public PaginationController()
-        {
-			System.debug('---Constructor-----');
-        }
-    
- 
+    public PaginationController()
+    {
+        System.debug('---Constructor-----');
+    }
+
     /* Dynamically fetch the month value from custom label. */
     public List<SelectOption> getMonthslist()
     {       
@@ -33,7 +32,7 @@ public class PaginationController
             options.add(new SelectOption(month,month));
         return options;        
     }
-    
+
     /* Dynamically fetch the year value from custom label */
     public List<SelectOption> getYearlist()
     {       
@@ -42,89 +41,95 @@ public class PaginationController
             options.add(new SelectOption(year,year));
         return options;        
     }
+
     private Date getDate(String choosenYear, String choosenMonth)
     {
         /* Converting the captured 'Year' & 'Month' into Date format and always the date will set as '1'
-			Example : if user selects "JAN" & "2018" then we are converting as "01-JAN-2018" */
+Example : if user selects "JAN" & "2018" then we are converting as "01-JAN-2018" */
         System.debug('---'+monthsMap);
         Date createdDate = Date.newInstance(integer.valueof(choosenYear), 
                                             monthsMap.get(choosenMonth), 1);         
         return createdDate;
     }
-    
+
+    /* After page is loaded then user can select specific year and month and if he/she clicks on GO button */
     Public PageReference go()
     {              
         PAGE_SIZE=5;
         page=1;
         currentIterationRecords= new List<Account>();
-        System.debug('---'+choosenYear);
-        System.debug('---'+choosenMonth);
-        Date CreatedDate = getDate(choosenYear,choosenMonth);
-        
-        Date EndDate = CreatedDate.addMonths(1);
-        
+	    Date CreatedDate = getDate(choosenYear,choosenMonth);        
+        Date EndDate = CreatedDate.addMonths(1);        
         retriveRecordsForPagination(CreatedDate,EndDate);
         PBFlag=true;
         
         return null;
     }
+    
+    /* To retrive the records from Data base */
     Public List<Account> recordsFromAccount(Date CreatedDate,Date EndDate)
     {
-       return [Select Id,Name From Account where CreatedDate>=:CreatedDate and CreatedDate<:EndDate];
+        return [Select Id,Name From Account where CreatedDate>=:CreatedDate and CreatedDate<:EndDate];
     }
-           
+
+   /* Initially Page is loaded then below action method will work */
     public void onPageLoad()
     {
         PBFlag=true;
-        PAGE_SIZE=3;
+        PAGE_SIZE=5;
         page=1;        
-       
-        Date CreatedDate = getDate(System.Label.YearsAvailable.split(',')[0],System.Label.Months.split(',')[0]);
         
-        Date EndDate = CreatedDate.addMonths(1);
-        
+        Date CreatedDate = getDate(System.Label.YearsAvailable.split(',')[0],System.Label.Months.split(',')[0]);        
+        Date EndDate = CreatedDate.addMonths(1);        
         retriveRecordsForPagination(CreatedDate,EndDate);  
     }
-    
     /* *************************Pagination Methods********************************************/
     public void doNext()
     {
-        if(getHasNext()){
+        if(getHasNext())
+        {
             this.page++;
+
+            Date CreatedDate = getDate(choosenYear,choosenMonth);
             
-        System.debug('---'+choosenYear);
-        System.debug('---'+choosenMonth);
- 		Date CreatedDate = getDate(choosenYear,choosenMonth);
-        
-        Date EndDate = CreatedDate.addMonths(1);
-        
-        retriveRecordsForPagination(CreatedDate,EndDate);
+            Date EndDate = CreatedDate.addMonths(1);
+            
+            retriveRecordsForPagination(CreatedDate,EndDate);
         }
     }
-    public Boolean getHasNext(){
-        if(this.page<this.totalPages){
+
+    public Boolean getHasNext()
+    {
+        if(this.page<this.totalPages)
+        {
             return true;
         }
-        else{
+        else
+        {
             return false;
         }
     }    
-    public Boolean getHasPrevious(){
-        if(this.page>1){
+    public Boolean getHasPrevious()
+    {
+        if(this.page>1)
+        {
             return true;
         }
-        else{
+        else
+        {
             return false;
         }
     }
-    public void doPrevious(){
-        if(getHasPrevious()){
+    public void doPrevious()
+    {
+        if(getHasPrevious())
+        {
             this.page--;
- 		Date CreatedDate = getDate(choosenYear,choosenMonth);
-        
-        Date EndDate = CreatedDate.addMonths(1);
-        
-        retriveRecordsForPagination(CreatedDate,EndDate);
+            Date CreatedDate = getDate(choosenYear,choosenMonth);
+            
+            Date EndDate = CreatedDate.addMonths(1);
+            
+            retriveRecordsForPagination(CreatedDate,EndDate);
         }
     }
     
@@ -134,27 +139,31 @@ public class PaginationController
         this.endIdx = this.page*PAGE_SIZE;
         this.totalRecords = 0;
         currentIterationRecords= new List<Account>();
-       // currentIterationRecords.clear();
         List<Account> accList = new List<Account>();
-         
-        accList=recordsFromAccount(CreatedDate,EndDate);
-               
-        for(Account acc : accList)
-        {
-            if(this.totalRecords>=this.startIdx && this.totalRecords<this.endIdx){
-                currentIterationRecords.add(acc);
-            }
-            this.totalRecords++;
-        }
         
+        accList=recordsFromAccount(CreatedDate,EndDate);
+        totalRecords=accList.size();
+        
+        Integer selectedRecordCount =0;
+        if(accList.size()>0)	
+        { 
+            if(accList.size() < this.endIdx)
+            {
+                selectedRecordCount = accList.size() - this.startIdx;
+            }
+            else
+            {
+                selectedRecordCount = PAGE_SIZE;
+            }
+            for(Integer i = 0; i < selectedRecordCount ; i++)
+            {
+                currentIterationRecords.add(accList[this.startIdx]);
+                this.startIdx++;
+            }
+        }
         Decimal pages = Decimal.valueOf(this.totalRecords);
         pages = pages.divide(Decimal.valueOf(PAGE_SIZE), 2);
         this.totalPages = (Integer)pages.round(System.RoundingMode.CEILING);
-        this.startIdx++;
-        if(this.endIdx>this.totalRecords){
-            this.endIdx = this.totalRecords;
-        }
     }
     /* *************************Pagination Methods end********************************************/
-    
 }
